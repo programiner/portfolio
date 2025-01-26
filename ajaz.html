@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajaz Ahmed - Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #2d2d2d;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --card-border: rgba(0, 0, 0, 0.05);
+            --primary-color: #6c63ff;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --card-bg: rgba(30, 30, 30, 0.9);
+            --card-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: var(--transition);
+        }
+
+        /* Scroll Animation */
+        .scroll-fade {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .scroll-fade.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h1, h2, h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.8rem 1.8rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 2rem;
+            text-decoration: none;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+        }
+
+        .theme-switcher {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+
+        .theme-toggle {
+            width: 3rem;
+            height: 1.5rem;
+            background: var(--card-border);
+            border-radius: 1rem;
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .theme-toggle::after {
+            content: '';
+            position: absolute;
+            width: 1.2rem;
+            height: 1.2rem;
+            background: var(--primary-color);
+            border-radius: 50%;
+            top: 0.15rem;
+            left: 0.15rem;
+            transition: var(--transition);
+        }
+
+        [data-theme="dark"] .theme-toggle::after {
+            transform: translateX(1.5rem);
+        }
+
+        #hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .hero-content p {
+            font-size: 1.25rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+            animation: fadeInUp 0.8s ease 0.2s backwards;
+        }
+
+        .hero-illustration {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            animation: float 12s ease-in-out infinite;
+        }
+
+        section {
+            padding: 6rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .skill-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid var(--card-border);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .skill-icon {
+            width: 4rem;
+            height: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .timeline-item {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid var(--card-border);
+            margin-bottom: 2rem;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .timeline-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .work-card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            border: 1px solid var(--card-border);
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .work-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .work-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .work-content {
+            padding: 1.5rem;
+        }
+
+        .profile-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .profile-pic {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover; /* Ensures the image fills the container */
+            object-position: center top; /* Moves the image down */            margin-bottom: 2rem;
+            border: 3px solid var(--primary-color);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        #contact {
+            background: var(--card-bg);
+            border-top: 1px solid var(--card-border);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .contact-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .contact-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        footer {
+            background: var(--card-bg);
+            padding: 2rem 0;
+            text-align: center;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            max-width: 800px;
+            width: 90%;
+            position: relative;
+            transform: scale(0.9);
+            animation: modalOpen 0.3s ease forwards;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes modalOpen {
+            to { transform: scale(1); }
+        }
+
+        #contact-form {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.5rem;
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .hero-content h1 { font-size: 2.5rem; }
+            .section-header h2 { font-size: 2rem; }
+            .contact-wrapper { grid-template-columns: 1fr; }
+            .works-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="theme-switcher">
+        <div class="theme-toggle" onclick="toggleTheme()"></div>
+    </div>
+
+    <section id="hero">
+        <img src="https://firebasestorage.googleapis.com/v0/b/pdfdekhoapp.appspot.com/o/Untitled-3%20(1).png?alt=media&token=ef7bf68b-848a-4ecb-a803-458d1e5b3add" class="hero-illustration" alt="Decoration">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Ajaz Ahmed</h1>
+                <p>Android Developer & UI/UX Designer</p>
+                <a href="#works" class="btn">Explore My Work</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills">
+        <div class="container">
+            <div class="section-header scroll-fade">
+                <h2>Skills</h2>
+            </div>
+            <div class="skills-grid scroll-fade">
+                <div class="skill-card">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/pdfdekhoapp.appspot.com/o/android-studio-icon%20(1).png?alt=media&token=8cec24c0-5224-42f4-a81f-21b872966673" class="skill-icon" alt="Android">
+                    <h3>Android Development</h3>
+                    <p>Native Android apps crafted with cutting-edge architecture</p>
+                </div>
+                <div class="skill-card">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/pdfdekhoapp.appspot.com/o/graphic-designer.png?alt=media&token=160e9111-8af4-4587-a359-2ba7c726dce8" class="skill-icon" alt="UI/UX">
+                    <h3>UI/UX Design</h3>
+                    <p>Exceptional user-centered interface design for modern experiences</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience">
+        <div class="container">
+            <div class="section-header scroll-fade">
+                <h2>Experience</h2>
+            </div>
+            <div class="timeline scroll-fade">
+                <div class="timeline-item">
+                    <h3><b>TelEmpathy</b> [Internship]</h3>
+                    <p>Jan 2022 - May 2022</p>
+                    <p>Role: Android App Development Intern<br>
+                        Duration: January 27, 2022 - May 27, 2022<br>
+                    Work: Created dynamic User Interface and backend systems for TelEmpathy's Android Application,</p> <div style="margin-top: 15px;" class="btn" onclick="openLink12()">View Certificate</div>
+                    </div>
+                    
+                    <script>
+                        function openLink12() {
+                            window.open("https://drive.google.com/file/d/1muaz4ZFqWY-vaHpDok1q2ZlUVZzcLiDI/view", "_blank");
+                        }
+                    </script>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="works">
+        <div class="container">
+            <div class="section-header scroll-fade">
+                <h2>Projects</h2>
+            </div>
+            <div class="works-grid scroll-fade">
+                <div class="work-card" onclick="showProjectModal(this)">
+                    <img src="https://play-lh.googleusercontent.com/c_jqQdJ8Nkm-t32Qf1HvjR-oH5Sz8eAcFsCOV80sEquTZNXIAC3EnhvNQQndQ3AN5g=w1080-h1080-rw" class="work-image" alt="PDF Reader">
+                    <div class="work-content">
+                        <h3>PDF Dekho App</h3>
+                        <p>Advanced PDF reader with dark mode</p>
+                        <div style="margin-top: 15px;" class="btn" onclick="openLink1()">View Details</div>
+                    </div>
+                    
+                    <script>
+                        function openLink1() {
+                            window.open("https://play.google.com/store/apps/details?id=com.programiner.pdfreader", "_blank");
+                        }
+                    </script>
+                    
+                </div>
+                <div class="work-card" onclick="showProjectModal(this)">
+                    <img src="https://imgs.search.brave.com/81zV_Gubbf6V-xDdPWKEZv9BjRvCkELVGvYI2uC8Pv0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzAwLzU2LzY3Lzg5/LzM2MF9GXzU2Njc4/OTYzX1ZWY3NrUnNi/c3VGenZuUk5rMjRZ/RnBranlhM1VkSVp5/LmpwZw" class="work-image" alt="E-Learning">
+                    <div class="work-content">
+                        <h3>E-Learning App</h3>
+                        <p>Interactive learning platform</p>
+                        <div style="margin-top: 15px;" class="btn" onclick="openLink2()">View Details</div>
+                    </div>
+                    
+                    <script>
+                        function openLink2() {
+                            window.open("https://drive.google.com/file/d/1qdxeFLJ5iw5cJGGY1Qa6WguDc1Ys2rh7/view", "_blank");
+                        }
+                    </script>
+
+                </div>
+                <div class="work-card" onclick="showProjectModal(this)">
+                    <img style=" object-fit: cover; /* Ensures the image fills the container */
+  object-position: left; /* Moves the image down */" src="https://imgs.search.brave.com/ZAWoFsQfG1QpDLL4UvWuka0Xmlu56niVHEHdOw8RGd0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zc3lv/dXR1YmUuY29tL2lt/Zy9zdGVwcy95dC12/aWRlby1kb3dubG9h/ZGVyX2hvdy10b18x/LnN2Zw" class="work-image" alt="E-Learning">
+                    <div class="work-content">
+                        <h3>VidGyan App</h3>
+                        <p>Simplify Video Curation, Empower Your Content Journey!                        </p>
+                        <div style="margin-top: 15px;" class="btn" onclick="openLink3()">View Details</div>
+                    </div>
+                    
+                    <script>
+                        function openLink3() {
+                            window.open("https://play.google.com/store/apps/details?id=com.programiner.vidgyan&hl=en_IN", "_blank");
+                        }
+                    </script>
+
+                </div>
+                <div class="work-card" onclick="showProjectModal(this)">
+                    <img src="https://imgs.search.brave.com/Z98jrqMYmjc-zPrICuxzkWn9rmVwaPZYCtejDWAZNso/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZGJj/ZG4uYi1jZG4ubmV0/L2ltZy9NYXJrZXRp/bmcvYm9vdHN0cmFw/LWVjb21tZXJjZS1j/b20vbWFpbi1uZXcu/d2VicA" class="work-image" alt="E-Commerce">
+                    <div class="work-content">
+                        <h3>E-Commerce App</h3>
+                        <p>Full-featured shopping platform</p>
+                        <div style="margin-top: 15px;" class="btn" onclick="openLink4()">View Details</div>
+                    </div>
+                    
+                    <script>
+                        function openLink4() {
+                            window.open("https://drive.google.com/file/d/1G9t5ptv3b_vJQT-9EawltcWTQCKjLV6E/view", "_blank");
+                        }
+                    </script>
+
+                </div>
+                <div class="work-card" onclick="showProjectModal(this)">
+                    <img src="https://imgs.search.brave.com/pCSSu9kCL7QNG6o1PoZqfnT6VFzsAkpSNxI6HvYL3Gc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWd2/My5mb3Rvci5jb20v/aW1hZ2VzL3NpZGUv/ZnJlZS1waG90by1l/ZGl0b3ItZm9yLXdp/bmRvd3NfMjAyMS0x/MC0wOS0wOTI3MTku/cG5n" class="work-image" alt="Photo Editor">
+                    <div class="work-content">
+                        <h3>Photo Editor App</h3>
+                        <p>Advanced image editing tools</p>
+                        <div style="margin-top: 15px;" class="btn" onclick="openLink5()">View Details</div>
+                    </div>
+                    
+                    <script>
+                        function openLink5() {
+                            window.open("https://drive.google.com/file/d/14djNKf7QhxXD3HTmqkvCLUkV_aVRCbLc/view", "_blank");
+                        }
+                    </script>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="profile">
+        <div class="container">
+            <div class="section-header scroll-fade">
+                <h2>Profile</h2>
+            </div>
+            <div class="profile-content scroll-fade">
+                <img src="https://firebasestorage.googleapis.com/v0/b/abeeha-enterprises.appspot.com/o/WhatsApp%20Image%202025-01-26%20at%2000.18.48_1da517c4.jpg?alt=media&token=b98058c6-700f-4a2b-a1ae-37be9c2040e8" class="profile-pic" alt="Ajaz Ahmed">
+                <p>Experienced Android developer passionate about creating user-centric mobile applications with modern design principles.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="container">
+            <div class="section-header scroll-fade">
+                <h2>Contact</h2>
+            </div>
+            <div class="contact-wrapper scroll-fade">
+             
+                <form id="contact-form" onsubmit="handleSubmit(event)">
+                    <div class="form-group">
+                        <input type="text" id="name" placeholder="Your Name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" placeholder="Your Email" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="message" placeholder="Your Message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn">Send Message</button>
+                </form>
+                <div class="contact-info">
+
+                   
+                    <div class="contact-item">
+                        <img src="https://firebasestorage.googleapis.com/v0/b/pdfdekhoapp.appspot.com/o/instagram.png?alt=media&token=af607f38-2acc-4232-bfb4-d474513c91d6" class="contact-icon" alt="insta">
+                        <span>@ig.ajaz</span>
+                    </div>
+                    <div class="contact-item">
+                        <img src="https://firebasestorage.googleapis.com/v0/b/pdfdekhoapp.appspot.com/o/github.png?alt=media&token=6bb95648-4c0a-4a09-8425-8601f19d3810" class="contact-icon" alt="github">
+                        <span>/programiner</span>
+                    </div>                    <div class="contact-item">
+                        <img src="https://firebasestorage.googleapis.com/v0/b/pdfdekhoapp.appspot.com/o/mobile.png?alt=media&token=2e598bf7-f278-4d99-872f-7fce39f8e497" class="contact-icon" alt="Phone">
+                        <span>+91 9086903002</span>
+                    </div> <div class="contact-item">
+                        <img src="https://firebasestorage.googleapis.com/v0/b/pdfdekhoapp.appspot.com/o/gmail.png?alt=media&token=157f84b5-cc4b-4ddb-8d8d-db50ab1e6288" class="contact-icon" alt="Email">
+                        <span>teamprograminer@gmail.com</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Ajaz Ahmed. All rights reserved</p>
+        </div>
+    </footer>
+
+    <div class="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        // Theme Management
+        function toggleTheme() {
+            const body = document.body;
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        }
+
+        // Initialize theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
+
+        // Modal Handling
+        function showProjectModal(card) {
+            const modalBody = document.querySelector('.modal-body');
+            modalBody.innerHTML = card.innerHTML;
+            document.querySelector('.modal-overlay').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.querySelector('.modal-overlay').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Contact Form
+        function handleSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+            
+            const subject = `Message from ${name}`;
+            const body = `Name: ${name}%0D%0AEmail: ${email}%0D%0AMessage: ${message}`;
+            
+            window.location.href = `mailto:teamprograminer@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+
+        // Scroll Animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, {
+            threshold: 0.25,
+            rootMargin: '0px'
+        });
+
+        document.querySelectorAll('.scroll-fade').forEach((element) => {
+            observer.observe(element);
+        });
+    </script>
+</body>
+</html>
