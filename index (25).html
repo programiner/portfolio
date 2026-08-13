@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>core// — Learn C &amp; Java Basics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAFAF7; --panel:#F1F0EA; --panel-2:#FFFFFF; --ink:#181A1B; --ink-soft:#5B5E57;
+  --line:#E2E0D6; --blue:#2B4C7E; --blue-soft:#E7EEF7; --amber:#DC922F; --amber-soft:#FBEEDA;
+  --green:#3E7B5A; --green-soft:#E7F1EB; --red:#B4483A; --red-soft:#FBEAE7;
+  --radius:10px; --mono:'JetBrains Mono', monospace; --disp:'Space Grotesk', sans-serif; --body:'Inter', sans-serif;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.6;}
+::selection{background:var(--amber-soft);}
+
+.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:14px 28px;background:rgba(250,250,247,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);gap:16px;flex-wrap:wrap;}
+.brand{font-family:var(--disp);font-weight:700;font-size:20px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px;}
+.brand .cursor{display:inline-block;width:9px;height:20px;background:var(--amber);animation:blink 1.1s steps(1) infinite;border-radius:2px;}
+@keyframes blink{50%{opacity:0;}}
+.lang-toggle{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;}
+.lang-toggle button{border:none;background:transparent;padding:7px 18px;border-radius:999px;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;transition:all .18s ease;}
+.lang-toggle button.active{background:var(--ink);color:var(--bg);}
+.uid-pill{font-family:var(--mono);font-size:11px;color:var(--ink-soft);display:flex;align-items:center;gap:6px;}
+.uid-dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+.uid-dot.off{background:var(--red);}
+.progress-pill{font-family:var(--mono);font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:8px;}
+.progress-track{width:90px;height:6px;background:var(--panel);border-radius:99px;overflow:hidden;border:1px solid var(--line);}
+.progress-fill{height:100%;background:var(--green);width:0%;transition:width .4s ease;}
+
+.shell{display:flex;max-width:1400px;margin:0 auto;align-items:flex-start;}
+.sidebar{width:270px;flex-shrink:0;position:sticky;top:65px;height:calc(100vh - 65px);overflow-y:auto;padding:26px 10px 40px 28px;}
+.sidebar-label{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);margin:18px 0 8px;padding-left:12px;}
+.sidebar-label:first-child{margin-top:0;}
+.navitem{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--ink-soft);font-weight:500;border-left:2px solid transparent;}
+.navitem:hover{background:var(--panel);color:var(--ink);}
+.navitem.active{background:var(--blue-soft);color:var(--blue);font-weight:600;border-left:2px solid var(--blue);}
+.navitem .num{font-family:var(--mono);font-size:11px;color:var(--ink-soft);width:18px;flex-shrink:0;}
+.navitem.active .num{color:var(--blue);}
+.navitem .check{margin-left:auto;font-size:12px;color:var(--green);opacity:0;}
+.navitem.done .check{opacity:1;}
+
+.main{flex:1;min-width:0;padding:34px 40px 100px;}
+
+.hero{padding:44px 0 30px;border-bottom:1px solid var(--line);margin-bottom:36px;}
+.hero .eyebrow{font-family:var(--mono);font-size:12px;color:var(--amber);font-weight:700;letter-spacing:.05em;}
+.hero h1{font-family:var(--disp);font-size:42px;line-height:1.08;letter-spacing:-.02em;margin:10px 0 14px;font-weight:700;}
+.hero h1 span{color:var(--blue);}
+.hero p{max-width:600px;color:var(--ink-soft);font-size:16px;margin:0 0 22px;}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;}
+.btn{font-family:var(--body);font-weight:600;font-size:14px;padding:11px 20px;border-radius:8px;border:1px solid var(--ink);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+.btn-primary{background:var(--ink);color:var(--bg);}
+.btn-ghost{background:transparent;color:var(--ink);}
+
+.topic{scroll-margin-top:80px;margin-bottom:70px;padding-top:6px;}
+.topic-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px;flex-wrap:wrap;justify-content:space-between;}
+.topic-head-left{display:flex;align-items:baseline;gap:14px;}
+.topic-index{font-family:var(--mono);font-size:14px;color:var(--ink-soft);}
+.topic h2{font-family:var(--disp);font-size:27px;margin:0;letter-spacing:-.01em;}
+.topic-sub{color:var(--ink-soft);font-size:15px;margin:0 0 20px;max-width:660px;}
+
+.mark-read{font-family:var(--mono);font-size:12px;font-weight:600;padding:7px 14px;border-radius:7px;border:1px solid var(--ink-soft);color:var(--ink-soft);background:transparent;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+.mark-read.done{background:var(--green-soft);border-color:var(--green);color:#1F5236;}
+
+.note-card{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;margin-bottom:16px;}
+.note-card h3{font-size:15px;margin:0 0 8px;font-family:var(--disp);}
+.note-card p{margin:0 0 10px;color:var(--ink);font-size:14.5px;}
+.note-card p:last-child{margin-bottom:0;}
+.note-card ul{margin:8px 0 0;padding-left:20px;}
+.note-card li{margin-bottom:5px;font-size:14.5px;}
+
+.code-block{background:#1B1D1B;color:#EDEDE6;border-radius:var(--radius);font-family:var(--mono);font-size:13px;line-height:1.65;padding:18px 20px;overflow-x:auto;margin:14px 0;position:relative;}
+.code-block .tag{position:absolute;top:0;right:0;background:var(--amber);color:#1B1D1B;font-weight:700;font-size:10.5px;padding:4px 10px;border-radius:0 8px 0 8px;font-family:var(--mono);}
+.code-block pre{margin:0;white-space:pre;}
+.kw{color:#E39D5A;} .str{color:#9CCB6E;} .cm{color:#7A7D74;font-style:italic;} .fn{color:#6FA8DC;}
+
+.keypoints{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 4px;}
+.chip{background:var(--amber-soft);border:1px solid #EED9B5;color:#8C5B14;font-size:12.5px;font-family:var(--mono);padding:5px 11px;border-radius:6px;}
+
+.practice-block{background:var(--blue-soft);border:1px solid #D3E0F0;border-radius:var(--radius);padding:22px 24px;margin-top:18px;}
+.practice-block h4{margin:0 0 14px;font-family:var(--disp);font-size:15px;color:var(--blue);display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap;}
+.q{margin-bottom:18px;padding-bottom:18px;border-bottom:1px dashed #C6D4E8;}
+.q:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.q p.qtext{font-weight:600;font-size:14.5px;margin:0 0 10px;}
+.opt{display:block;background:var(--panel-2);border:1px solid var(--line);border-radius:7px;padding:9px 13px;margin-bottom:7px;cursor:pointer;font-size:14px;transition:all .12s ease;}
+.opt:hover{border-color:var(--blue);}
+.opt.correct{background:var(--green-soft);border-color:var(--green);color:#1F5236;font-weight:600;}
+.opt.wrong{background:var(--red-soft);border-color:var(--red);color:#7C2A1F;font-weight:600;}
+.opt.disabled{pointer-events:none;}
+.score-line{font-family:var(--mono);font-size:13px;color:var(--blue);margin-top:12px;}
+
+footer{text-align:center;padding:40px 20px;color:var(--ink-soft);font-size:13px;font-family:var(--mono);border-top:1px solid var(--line);}
+
+.runner{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+.runner-head{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);}
+.runner-head .fname{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);}
+.runner textarea{width:100%;min-height:260px;background:#1B1D1B;color:#EDEDE6;border:none;font-family:var(--mono);font-size:13.5px;padding:16px 20px;resize:vertical;line-height:1.6;display:block;}
+.runner-actions{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-top:1px solid var(--line);flex-wrap:wrap;gap:10px;}
+.run-btn{font-family:var(--mono);font-weight:700;font-size:13px;background:var(--green);color:#fff;border:none;padding:9px 20px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:8px;}
+.run-btn:disabled{opacity:.5;cursor:progress;}
+.reset-btn{font-family:var(--mono);font-size:12px;background:transparent;border:1px solid var(--ink-soft);color:var(--ink-soft);padding:7px 14px;border-radius:6px;cursor:pointer;}
+.output-box{background:#101211;color:#D6D8D2;font-family:var(--mono);font-size:13px;padding:16px 20px;min-height:70px;white-space:pre-wrap;border-top:1px solid #2b2d2b;}
+.output-box .err{color:#E58989;}
+.output-box .placeholder{color:#6C6F68;}
+.stdin-row{padding:0 16px 14px;}
+.stdin-row label{font-family:var(--mono);font-size:11px;color:var(--ink-soft);display:block;margin-bottom:6px;}
+.stdin-row input{width:100%;background:#1B1D1B;color:#EDEDE6;border:1px solid #333;border-radius:6px;padding:8px 12px;font-family:var(--mono);font-size:12.5px;}
+
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .main{padding:24px 18px 80px;}
+  .hero h1{font-size:30px;}
+  .topbar{padding:12px 16px;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="cursor"></span>core<span style="color:var(--ink-soft)">//</span></div>
+  <div class="lang-toggle">
+    <button id="btnC" class="active" onclick="setLang('c')">C</button>
+    <button id="btnJava" onclick="setLang('java')">JAVA</button>
+  </div>
+  <div class="progress-pill">
+    <span id="progressText">0 / 7 read</span>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+  <div class="uid-pill"><span class="uid-dot off" id="uidDot"></span><span id="uidText">connecting to cloud sync…</span></div>
+</div>
+
+<div class="shell">
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-label">Learn</div>
+    <div id="navlist"></div>
+    <div class="sidebar-label">Practice</div>
+    <div class="navitem" onclick="scrollToId('quiz-all')"><span class="num">✎</span> Mixed quiz</div>
+    <div class="navitem" onclick="scrollToId('sandbox')"><span class="num">▷</span> Code editor</div>
+  </nav>
+
+  <main class="main">
+    <div class="hero">
+      <div class="eyebrow">// COLLEGE STUDY GUIDE — SEMESTER 1</div>
+      <h1>Learn <span id="langWordC">C</span> basics,<br>one topic at a time.</h1>
+      <p id="heroPara">Detailed, simple-English notes for C — with real code, quizzes, and a live editor to actually run what you write. Switch to Java anytime using the toggle at the top.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#topic-1">Start learning →</a>
+        <a class="btn btn-ghost" href="#quiz-all">Jump to practice</a>
+      </div>
+    </div>
+
+    <div id="topics"></div>
+
+    <div class="topic" id="quiz-all">
+      <div class="topic-head"><div class="topic-head-left"><span class="topic-index">MIX</span><h2>Mixed practice quiz</h2></div></div>
+      <p class="topic-sub">12 random questions from every topic in the language you're viewing. Reload the page or switch language to get a fresh set — good for a last-minute revision round.</p>
+      <div class="practice-block" id="mixedQuizBox">
+        <h4>✎ Mixed quiz <button class="reset-btn" onclick="renderMixedQuiz()">Shuffle again</button></h4>
+      </div>
+      <div class="score-line" id="mixedScore"></div>
+    </div>
+
+    <div class="topic" id="sandbox">
+      <div class="topic-head"><div class="topic-head-left"><span class="topic-index">▷</span><h2>Code editor</h2></div></div>
+      <p class="topic-sub">Write real C or Java code and run it — actually compiled and executed, not simulated. Your code auto-saves to the cloud so it's there next time you sign in on this device.</p>
+      <div class="runner">
+        <div class="runner-head">
+          <span class="fname" id="runnerFilename">main.c</span>
+          <span class="fname" id="runnerStatus">idle</span>
+        </div>
+        <textarea id="editorArea" spellcheck="false"></textarea>
+        <div class="stdin-row">
+          <label>stdin (optional input for scanf / Scanner, one value per line)</label>
+          <input id="stdinBox" placeholder="e.g. 25">
+        </div>
+        <div class="runner-actions">
+          <button class="run-btn" id="runBtn" onclick="runCode()">▷ Run code</button>
+          <button class="reset-btn" onclick="resetEditor()">Reset to template</button>
+        </div>
+        <div class="output-box" id="outputBox"><span class="placeholder">Output will appear here after you run your code…</span></div>
+      </div>
+    </div>
+
+    <footer>built for exam week · code runs via the free Piston API · progress synced to Firestore</footer>
+  </main>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAYrhUiU6fzNJlyrKMPtaJh_DJVVA6VgjE",
+  authDomain: "cloud-storage-c125e.firebaseapp.com",
+  projectId: "cloud-storage-c125e",
+  storageBucket: "cloud-storage-c125e.appspot.com",
+  messagingSenderId: "157506012406",
+  appId: "1:157506012406:web:45a614200690f685b558d7",
+  measurementId: "G-RQ0VBF0E54"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let studentDocRef = null;
+
+function setUidUi(connected, label){
+  document.getElementById('uidDot').classList.toggle('off', !connected);
+  document.getElementById('uidText').textContent = label;
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if(user){
+    studentDocRef = doc(db, "students", user.uid);
+    setUidUi(true, "synced · " + user.uid.slice(0,6));
+    let state = { read:{}, quizScores:{}, sandbox:{} };
+    try{
+      const snap = await getDoc(studentDocRef);
+      if(snap.exists()) state = Object.assign(state, snap.data());
+      else await setDoc(studentDocRef, state);
+    }catch(e){ console.warn("firestore read failed", e); }
+    window.__cloudReady(state);
+  }
+});
+signInAnonymously(auth).catch(()=>{
+  setUidUi(false, "offline mode (cloud sync unavailable)");
+  window.__cloudReady({read:{}, quizScores:{}, sandbox:{}});
+});
+
+window.__cloudSave = async function(patch){
+  if(!studentDocRef) return;
+  try{ await setDoc(studentDocRef, patch, {merge:true}); }
+  catch(e){ console.warn("cloud save failed", e); }
+};
+</script>
+
+<script>
+/* ============ CONTENT DATA — SEPARATE FOR C AND JAVA ============ */
+const content = { c: [], java: [] };
+
+content.c = [
+{
+  id:"basics", title:"C Programming Basics", sub:"How a C program is structured, and how it runs.",
+  notes:[
+    {h:"What is C?", p:"C is a general-purpose, procedural language created in 1972. It is often called a system language because it lets you work close to how the computer's memory actually behaves, which is why it's still used for operating systems, embedded devices, and drivers."},
+    {h:"Structure of a C program", p:"A C program usually has: (1) preprocessor directives like #include, which pull in ready-made code libraries; (2) the main() function, where execution always starts; (3) statements inside { } that do the actual work; and (4) a return statement that reports back to the operating system whether the program finished successfully (0 means success)."},
+    {h:"Compilation — a key C idea", p:"C code is not run directly. It is first compiled — translated by a compiler like gcc into machine code — and only that compiled file is executed. If there is a syntax mistake, the compiler stops and shows an error before the program ever runs."},
+    {h:"Comments", p:"Use // for a single-line comment and /* ... */ for a comment that spans multiple lines. Comments are ignored by the compiler and exist only to explain the code to humans."},
+  ],
+  code:`<span class="cm">// hello.c</span>
+<span class="kw">#include</span> &lt;stdio.h&gt;   <span class="cm">// gives us printf</span>
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="fn">printf</span>(<span class="str">"Hello, World!\\n"</span>);
+    <span class="kw">return</span> 0;  <span class="cm">// 0 = program ended successfully</span>
+}`,
+  chips:["#include brings in libraries","main() is the entry point","Code is compiled, then run","; ends every statement"],
+  quiz:[
+    {q:"Which function is the starting point of every C program?", opts:["start()","main()","init()","run()"], a:1},
+    {q:"What does #include <stdio.h> do?", opts:["Deletes a file","Brings in the standard input/output library","Starts the main function","Ends the program"], a:1},
+    {q:"C code must be _____ before it can run.", opts:["Interpreted","Compiled","Encrypted","Deleted"], a:1},
+    {q:"What does 'return 0;' at the end of main() usually mean?", opts:["The program crashed","The program ran successfully","The program is paused","There was a syntax error"], a:1},
+    {q:"Which symbol starts a single-line comment in C?", opts:["#", "//", "<!--", "'''"], a:1},
+    {q:"Which header file is needed for printf and scanf?", opts:["stdlib.h","stdio.h","string.h","main.h"], a:1},
+  ]
+},
+{
+  id:"algo", title:"Algorithms & Flowcharts", sub:"Planning your C program's logic before you write any code.",
+  notes:[
+    {h:"What is an algorithm?", p:"An algorithm is a step-by-step plan, written in plain language, that solves one specific problem. You write the algorithm first, then translate it into C syntax — this keeps your thinking separate from language rules."},
+    {h:"What is a flowchart?", p:"A flowchart is the visual version of an algorithm, drawn with standard shapes: an oval for Start/End, a rectangle for a processing step, a parallelogram for input/output, and a diamond for a decision that branches the flow."},
+    {h:"Example: sum of two numbers", p:"Algorithm — Step 1: Start. Step 2: Read a and b. Step 3: Compute sum = a + b. Step 4: Print sum. Step 5: Stop. This maps almost directly onto a C program: two scanf() calls, one addition, one printf()."},
+  ],
+  code:`<span class="cm">/* Algorithm for finding the largest of two numbers:
+   1. Start
+   2. Read a, b
+   3. If a > b, largest = a, else largest = b
+   4. Print largest
+   5. Stop */</span>
+
+<span class="kw">#include</span> &lt;stdio.h&gt;
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> a, b;
+    <span class="fn">scanf</span>(<span class="str">"%d %d"</span>, &amp;a, &amp;b);
+    <span class="kw">if</span> (a &gt; b) <span class="fn">printf</span>(<span class="str">"%d"</span>, a);
+    <span class="kw">else</span> <span class="fn">printf</span>(<span class="str">"%d"</span>, b);
+}`,
+  chips:["Oval = start/end","Rectangle = process step","Diamond = decision","Parallelogram = input/output"],
+  quiz:[
+    {q:"In a flowchart, which shape represents a decision?", opts:["Rectangle","Oval","Diamond","Circle"], a:2},
+    {q:"An algorithm should be written before:", opts:["The idea exists","You write the actual code","You test the code","None of these"], a:1},
+    {q:"Which shape is normally used for input/output steps?", opts:["Diamond","Parallelogram","Triangle","Hexagon"], a:1},
+    {q:"scanf() in C is mainly used to:", opts:["Print output","Read input from the user","Declare a function","Compile code"], a:1},
+    {q:"What does & mean before a variable in scanf, like &a?", opts:["Multiplication","The address of the variable","A comment","Bitwise AND only"], a:1},
+  ]
+},
+{
+  id:"vars", title:"Variables, Data Types & Operators", sub:"Storing values in memory and computing with them in C.",
+  notes:[
+    {h:"Declaring variables", p:"In C, every variable must be declared with a data type before use: type name; for example int age;. C is statically typed — once declared, a variable's type cannot change."},
+    {h:"Core data types", p:"int stores whole numbers (usually 4 bytes). float and double store decimals, double being more precise. char stores one character in single quotes, like 'A'. Classic C has no true boolean type built in — 0 means false and any non-zero value means true (or you can #include <stdbool.h> for bool)."},
+    {h:"Arithmetic operators", p:"+, -, *, / do the four basic operations. % (modulus) gives the remainder of integer division — very commonly used to check odd/even numbers."},
+    {h:"Relational & logical operators", p:"Relational operators (==, !=, >, <, >=, <=) compare two values and produce 1 (true) or 0 (false). Logical operators combine conditions: && (AND — both must be true), || (OR — at least one true), ! (NOT — flips true/false)."},
+  ],
+  code:`<span class="kw">#include</span> &lt;stdio.h&gt;
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> age = 20;
+    <span class="kw">float</span> price = 99.5;
+    <span class="kw">char</span> grade = <span class="str">'A'</span>;
+
+    <span class="kw">int</span> sum = age + 5;        <span class="cm">// arithmetic</span>
+    <span class="kw">int</span> isAdult = (age &gt;= 18); <span class="cm">// relational -> 1</span>
+    <span class="kw">int</span> isEven = (age % 2 == 0);<span class="cm">// modulus -> 1</span>
+
+    <span class="fn">printf</span>(<span class="str">"%d %d"</span>, sum, isAdult);
+}`,
+  chips:["int, float, double, char","0 = false, non-zero = true","% gives remainder","&& / || / ! for logic"],
+  quiz:[
+    {q:"Which keyword declares a whole number in C?", opts:["decimal","int","num","whole"], a:1},
+    {q:"In classic C, which value represents 'false'?", opts:["-1","1","0","null"], a:2},
+    {q:"What does 7 % 2 evaluate to?", opts:["3.5","1","0","3"], a:1},
+    {q:"Which operator means logical AND?", opts:["&", "&&", "AND", "|"], a:1},
+    {q:"Which format specifier is used to print a float in printf?", opts:["%d","%c","%f","%s"], a:2},
+    {q:"Which format specifier is used to print an int in printf?", opts:["%f","%d","%c","%s"], a:1},
+  ]
+},
+{
+  id:"cond", title:"Conditional Statements", sub:"Letting your C program choose between different paths.",
+  notes:[
+    {h:"if / else", p:"An if statement runs its block only when the condition inside ( ) evaluates to a non-zero (true) value. Pair it with else for the opposite case, and else if to test more conditions in sequence."},
+    {h:"switch statement", p:"switch compares one variable against several constant values using case labels. Each case should end with break — otherwise C 'falls through' and keeps executing the next case's code too, a very common beginner bug."},
+    {h:"Nested and ternary", p:"You can place an if inside another if for multi-level checks. C also supports a shortcut called the ternary operator: condition ? valueIfTrue : valueIfFalse."},
+  ],
+  code:`<span class="kw">#include</span> &lt;stdio.h&gt;
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> marks = 82;
+    <span class="kw">if</span> (marks &gt;= 90) {
+        <span class="fn">printf</span>(<span class="str">"Grade A"</span>);
+    } <span class="kw">else if</span> (marks &gt;= 75) {
+        <span class="fn">printf</span>(<span class="str">"Grade B"</span>);
+    } <span class="kw">else</span> {
+        <span class="fn">printf</span>(<span class="str">"Grade C"</span>);
+    }
+
+    <span class="kw">switch</span> (marks / 10) {
+        <span class="kw">case</span> 9: <span class="fn">printf</span>(<span class="str">"A"</span>); <span class="kw">break</span>;
+        <span class="kw">case</span> 8: <span class="fn">printf</span>(<span class="str">"B"</span>); <span class="kw">break</span>;
+        <span class="kw">default</span>: <span class="fn">printf</span>(<span class="str">"C"</span>);
+    }
+}`,
+  chips:["if / else if / else","switch needs break","default = fallback case","ternary: cond ? a : b"],
+  quiz:[
+    {q:"What happens if you forget 'break' in a switch case in C?", opts:["Compiler error","Program crashes","Execution falls through to the next case","Nothing changes"], a:2},
+    {q:"Which keyword provides the default action in a switch block?", opts:["else","default","other","final"], a:1},
+    {q:"What does the condition inside if() need to evaluate to, to run the block?", opts:["A string","Any non-zero value","Exactly 1","A char"], a:1},
+    {q:"The ternary operator in C looks like:", opts:["cond => a : b","cond ? a : b","if(cond) a else b","cond -> a, b"], a:1},
+    {q:"Can you put an if statement inside another if statement in C?", opts:["No, never allowed","Yes, this is called nesting","Only inside loops","Only in Java"], a:1},
+  ]
+},
+{
+  id:"loops", title:"Loops", sub:"Repeating work efficiently in C.",
+  notes:[
+    {h:"for loop", p:"Best when you know the number of repetitions in advance. Its header has three parts separated by semicolons: initialization; condition; update — for example for(int i=1; i<=5; i++)."},
+    {h:"while loop", p:"Checks the condition before each run of the loop body. Use it when the number of repeats depends on something that can change while the program runs, like reading input until the user types -1."},
+    {h:"do-while loop", p:"Checks the condition after running the body, so the body always executes at least once — useful for menu-driven programs where you want to show the menu at least one time."},
+    {h:"break and continue", p:"break immediately exits the nearest loop. continue skips the rest of the current iteration and jumps to the next one."},
+  ],
+  code:`<span class="kw">#include</span> &lt;stdio.h&gt;
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">for</span> (<span class="kw">int</span> i = 1; i &lt;= 5; i++) {
+        <span class="fn">printf</span>(<span class="str">"%d "</span>, i);
+    }
+
+    <span class="kw">int</span> i = 1;
+    <span class="kw">while</span> (i &lt;= 5) {
+        <span class="fn">printf</span>(<span class="str">"%d "</span>, i);
+        i++;
+    }
+
+    <span class="kw">do</span> {
+        <span class="fn">printf</span>(<span class="str">"runs once even if false "</span>);
+    } <span class="kw">while</span> (0);
+}`,
+  chips:["for = known count","while = checks first","do-while = runs first, checks after","break exits, continue skips"],
+  quiz:[
+    {q:"Which loop always runs its body at least once?", opts:["for","while","do-while","switch"], a:2},
+    {q:"For 'for(int i=1;i<=5;i++)', how many times does the body run?", opts:["4","5","6","Infinite"], a:1},
+    {q:"Which keyword immediately exits a loop entirely?", opts:["continue","break","return","stop"], a:1},
+    {q:"Which keyword skips to the next iteration without exiting the loop?", opts:["break","continue","exit","pass"], a:1},
+    {q:"A while loop checks its condition:", opts:["After running the body","Before running the body","Never","Only once at compile time"], a:1},
+    {q:"What kind of loop is best when the number of repeats is unknown ahead of time?", opts:["for","while","Neither works","do-while only"], a:1},
+  ]
+},
+{
+  id:"func", title:"Functions", sub:"Splitting a C program into small, reusable blocks.",
+  notes:[
+    {h:"Function structure", p:"A C function has a return type, a name, and a parameter list: returnType name(parameters) { ...body... }. If a function returns nothing, its return type is void. Functions must usually be declared (a prototype) before main() if they are defined after it."},
+    {h:"Parameters are passed by value", p:"By default, C copies the value of an argument into the function — changes made inside the function do not affect the original variable. To actually modify a variable from outside, you pass its address using pointers (&), a concept usually introduced right after this topic."},
+    {h:"Why functions matter", p:"They let you name a piece of logic once and reuse it everywhere, make programs easier to read and test, and are the foundation for organizing any real-sized C project."},
+  ],
+  code:`<span class="kw">#include</span> &lt;stdio.h&gt;
+
+<span class="kw">int</span> <span class="fn">square</span>(<span class="kw">int</span> n) {   <span class="cm">// function definition</span>
+    <span class="kw">return</span> n * n;
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> result = <span class="fn">square</span>(5); <span class="cm">// function call</span>
+    <span class="fn">printf</span>(<span class="str">"%d"</span>, result);   <span class="cm">// 25</span>
+}`,
+  chips:["void = no return value","pass by value (a copy)","prototype before main() if needed","one job per function"],
+  quiz:[
+    {q:"A C function that returns nothing has return type:", opts:["null","empty","void","none"], a:2},
+    {q:"By default, C passes arguments to functions:", opts:["By reference","By value (a copy)","By pointer only","Randomly"], a:1},
+    {q:"The values you send into a function call are called:", opts:["Return types","Arguments/parameters","Loops","Prototypes"], a:1},
+    {q:"What is a function prototype used for?", opts:["Running the program faster","Telling the compiler about a function before it's defined","Deleting a function","Looping"], a:1},
+    {q:"What must you use to let a function actually modify a variable from outside it?", opts:["A comment","A pointer (address)","A bigger data type","A loop"], a:1},
+  ]
+},
+{
+  id:"recur", title:"Recursion", sub:"A C function that calls itself to solve smaller versions of a problem.",
+  notes:[
+    {h:"How recursion works", p:"A recursive function calls itself with a smaller or simpler input each time, until it reaches a stopping point. Each call is placed on the call stack, and results are combined as the calls return."},
+    {h:"Base case is essential", p:"Every recursive function needs a base case — a condition that stops further calls. Without one, the function calls itself endlessly until it runs out of stack memory, causing a stack overflow / crash."},
+    {h:"Classic example: factorial", p:"factorial(n) = n * factorial(n-1), with base case factorial(0) = 1. Tracing factorial(3): 3 * factorial(2) → 3 * (2 * factorial(1)) → 3 * (2 * (1 * factorial(0))) → 3*2*1*1 = 6."},
+  ],
+  code:`<span class="kw">#include</span> &lt;stdio.h&gt;
+
+<span class="kw">int</span> <span class="fn">factorial</span>(<span class="kw">int</span> n) {
+    <span class="kw">if</span> (n == 0)         <span class="cm">// base case</span>
+        <span class="kw">return</span> 1;
+    <span class="kw">return</span> n * <span class="fn">factorial</span>(n - 1); <span class="cm">// recursive call</span>
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="fn">printf</span>(<span class="str">"%d"</span>, <span class="fn">factorial</span>(5)); <span class="cm">// 120</span>
+}`,
+  chips:["base case stops it","recursive case moves toward base","uses the call stack","no base case = stack overflow"],
+  quiz:[
+    {q:"What is the purpose of a base case in recursion?", opts:["To make the function longer","To stop the function from calling itself forever","To slow the program down","It's optional and rarely needed"], a:1},
+    {q:"What happens with no base case?", opts:["Faster execution","Stack overflow / crash","Compiler warning only","Nothing, it auto-stops after 100 calls"], a:1},
+    {q:"factorial(4) using the code above returns:", opts:["12","24","16","4"], a:1},
+    {q:"Where do pending recursive calls get stored while waiting to return?", opts:["The heap","A file","The call stack","A global array"], a:2},
+  ]
+},
+{
+  id:"arrays", title:"Arrays", sub:"Storing many values of one type in a single block of memory.",
+  notes:[
+    {h:"Declaring an array", p:"type name[size]; reserves a contiguous block of memory for that many elements of that type, e.g. int marks[5];. In C, the size must be a fixed constant — it cannot grow later."},
+    {h:"Indexing", p:"Elements are accessed with marks[i], where the index starts at 0 and goes up to size-1. Accessing marks[5] on a 5-element array is out of bounds — C does not stop you, which can silently corrupt memory, so always double-check your loop bounds."},
+    {h:"Arrays and loops", p:"Arrays are almost always processed with a for loop, since you usually know their fixed size in advance: for(int i=0;i<5;i++) uses the array's known length directly."},
+  ],
+  code:`<span class="kw">#include</span> &lt;stdio.h&gt;
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> marks[5] = {90, 85, 76, 60, 99};
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; 5; i++) {
+        <span class="fn">printf</span>(<span class="str">"%d "</span>, marks[i]);
+    }
+    <span class="cm">// marks[0] is 90, the first element</span>
+}`,
+  chips:["index starts at 0","fixed size, set once","no automatic bounds checking","process with a for loop"],
+  quiz:[
+    {q:"What is the index of the first element of a C array?", opts:["1","-1","0","Depends on the compiler"], a:2},
+    {q:"Given int marks[5]={90,85,76,60,99}, what is marks[2]?", opts:["90","85","76","60"], a:2},
+    {q:"Does C automatically stop you from accessing an out-of-bounds index?", opts:["Yes, always","No, it does not check","Only in debug mode","Only for arrays of size > 10"], a:1},
+    {q:"Once declared with a fixed size, a plain C array can:", opts:["Grow automatically","Shrink automatically","Not resize itself","Change its data type"], a:2},
+  ]
+}
+];
+
+content.java = [
+{
+  id:"basics", title:"Java Programming Basics", sub:"How a Java program is structured, and how it runs on the JVM.",
+  notes:[
+    {h:"What is Java?", p:"Java is a general-purpose, object-oriented language where almost everything lives inside a class. Java code compiles into 'bytecode' (not direct machine code), which then runs on the Java Virtual Machine (JVM) — this is why Java programs can run unchanged on Windows, Mac, or Linux."},
+    {h:"Structure of a Java program", p:"A minimal Java program needs a class declaration (public class Name), and inside it, a main method with the exact signature public static void main(String[] args) — this is where the JVM starts executing. The file name must match the public class name exactly, including capitalization."},
+    {h:"Compile then run", p:"Java source files end in .java. The javac compiler turns them into .class bytecode files, and the java command then runs that bytecode on the JVM. This two-step process (compile once, run anywhere) is one of Java's biggest selling points."},
+    {h:"Comments", p:"Same as many C-family languages: // for single-line, /* ... */ for multi-line, and /** ... */ for special documentation comments (Javadoc) that describe classes and methods."},
+  ],
+  code:`<span class="cm">// Hello.java</span>
+<span class="kw">public class</span> <span class="fn">Hello</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+        System.out.<span class="fn">println</span>(<span class="str">"Hello, World!"</span>);
+    }
+}`,
+  chips:["Everything lives in a class","main(String[] args) is the entry point","Compiled to bytecode, run on JVM","File name = public class name"],
+  quiz:[
+    {q:"What must the file name match in a Java program?", opts:["The method name","The public class name","The package name","Nothing specific"], a:1},
+    {q:"Java source code compiles into:", opts:["Direct machine code","Bytecode, run by the JVM","Python code","HTML"], a:1},
+    {q:"What is the exact signature of Java's entry point method?", opts:["void main()","public static void main(String[] args)","int main(void)","static main()"], a:1},
+    {q:"Which statement prints text with a new line in Java?", opts:["System.out.print()","System.out.println()","print()","cout <<"], a:1},
+    {q:"Which symbol starts a single-line comment in Java?", opts:["#", "//", "<!--", "%%"], a:1},
+    {q:"What is the compiled Java file extension called?", opts:[".exe",".class",".jar only",".obj"], a:1},
+  ]
+},
+{
+  id:"algo", title:"Algorithms & Flowcharts", sub:"Planning your Java program's logic before you write any code.",
+  notes:[
+    {h:"What is an algorithm?", p:"An algorithm is a step-by-step plan for solving a problem, written in plain language rather than any specific syntax. It's language-independent — the same algorithm could later be written in Java, C, or Python."},
+    {h:"What is a flowchart?", p:"A flowchart draws that plan visually: ovals for Start/End, rectangles for processing steps, parallelograms for input/output, and diamonds for decisions with Yes/No branches."},
+    {h:"From plan to Java code", p:"Once the algorithm and flowchart are ready, translating them into Java mostly means picking the right Java construct for each shape: a diamond becomes an if statement, a loop-back arrow becomes a for or while loop, and a rectangle becomes a line of code."},
+  ],
+  code:`<span class="cm">/* Algorithm: find the largest of two numbers
+   1. Start
+   2. Read a, b
+   3. If a > b, largest = a, else largest = b
+   4. Print largest
+   5. Stop */</span>
+
+<span class="kw">import</span> java.util.Scanner;
+<span class="kw">public class</span> <span class="fn">Largest</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+        Scanner sc = <span class="kw">new</span> Scanner(System.in);
+        <span class="kw">int</span> a = sc.nextInt(), b = sc.nextInt();
+        System.out.println(a &gt; b ? a : b);
+    }
+}`,
+  chips:["Oval = start/end","Diamond = decision","Scanner reads user input","Plan first, code second"],
+  quiz:[
+    {q:"In a flowchart, which shape represents a decision?", opts:["Rectangle","Oval","Diamond","Circle"], a:2},
+    {q:"Which built-in Java class is commonly used to read keyboard input?", opts:["Reader","Scanner","InputBox","System.in()"], a:1},
+    {q:"An algorithm is best described as:", opts:["Compiled Java bytecode","A step-by-step plan in plain language","A type of loop","A Java keyword"], a:1},
+    {q:"Which flowchart shape usually represents input or output?", opts:["Diamond","Parallelogram","Oval","Rectangle"], a:1},
+    {q:"Which package must be imported to use the Scanner class?", opts:["java.io","java.util","java.lang","java.scan"], a:1},
+  ]
+},
+{
+  id:"vars", title:"Variables, Data Types & Operators", sub:"Storing values in memory and computing with them in Java.",
+  notes:[
+    {h:"Declaring variables", p:"Java is statically typed: type name = value; for example int age = 20;. Once declared with a type, a variable can only ever hold that type of value — this is checked by the compiler before the program even runs."},
+    {h:"Primitive data types", p:"int (whole numbers), double (decimals — the default choice over float for most calculations), char (a single character in single quotes), and boolean (true or false — a real built-in type in Java, unlike classic C)."},
+    {h:"Reference type: String", p:"Text in Java is stored using the String type (capital S, in double quotes), which is technically an object, not a primitive — but you use it just like any other variable for everyday purposes."},
+    {h:"Operators", p:"Arithmetic: +, -, *, /, % (remainder). Relational: ==, !=, >, <, >=, <= — these return an actual boolean in Java. Logical: && (AND), || (OR), ! (NOT) — these only work on boolean values, unlike C where any non-zero number counts as true."},
+  ],
+  code:`<span class="kw">public class</span> <span class="fn">Vars</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+        <span class="kw">int</span> age = 20;
+        <span class="kw">double</span> price = 99.5;
+        <span class="kw">char</span> grade = <span class="str">'A'</span>;
+        <span class="kw">boolean</span> isAdult = (age &gt;= 18); <span class="cm">// true</span>
+
+        <span class="kw">int</span> sum = age + 5;
+        <span class="kw">boolean</span> isEven = (age % 2 == 0);
+        System.out.println(sum + <span class="str">" "</span> + isAdult);
+    }
+}`,
+  chips:["int, double, char, boolean","boolean is a real type","% gives remainder","&&/|| only work on booleans"],
+  quiz:[
+    {q:"Which Java type holds true/false directly?", opts:["int","boolean","char","bit"], a:1},
+    {q:"What does 7 % 2 evaluate to in Java?", opts:["3.5","1","0","7"], a:1},
+    {q:"In Java, && and || operate only on:", opts:["Integers","Strings","boolean values","Any non-zero number"], a:2},
+    {q:"Which type is generally preferred for decimal numbers in Java?", opts:["float","double","decimal","real"], a:1},
+    {q:"Text like \"Hello\" in Java is stored using the type:", opts:["char","text","String","word"], a:2},
+    {q:"Which of these is a valid Java variable declaration?", opts:["int 2age = 20;","int age = 20;","integer age = 20","20 = int age;"], a:1},
+  ]
+},
+{
+  id:"cond", title:"Conditional Statements", sub:"Letting your Java program choose between different paths.",
+  notes:[
+    {h:"if / else", p:"An if statement's condition must evaluate to an actual boolean — unlike C, you cannot use a plain number here. else and else if work the same way, letting you chain multiple checks."},
+    {h:"switch statement", p:"Compares one variable against fixed case values. Each case should end with break to avoid falling through to the next case. Modern Java also supports a cleaner arrow-style switch (case X -> ...), but the classic colon-and-break form is what most intro courses teach first."},
+    {h:"Ternary operator", p:"A compact one-line if/else: condition ? valueIfTrue : valueIfFalse, e.g. String result = (marks >= 40) ? \"Pass\" : \"Fail\";"},
+  ],
+  code:`<span class="kw">public class</span> <span class="fn">Grade</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+        <span class="kw">int</span> marks = 82;
+        <span class="kw">if</span> (marks &gt;= 90) {
+            System.out.println(<span class="str">"Grade A"</span>);
+        } <span class="kw">else if</span> (marks &gt;= 75) {
+            System.out.println(<span class="str">"Grade B"</span>);
+        } <span class="kw">else</span> {
+            System.out.println(<span class="str">"Grade C"</span>);
+        }
+
+        <span class="kw">switch</span> (marks / 10) {
+            <span class="kw">case</span> 9: System.out.println(<span class="str">"A"</span>); <span class="kw">break</span>;
+            <span class="kw">case</span> 8: System.out.println(<span class="str">"B"</span>); <span class="kw">break</span>;
+            <span class="kw">default</span>: System.out.println(<span class="str">"C"</span>);
+        }
+    }
+}`,
+  chips:["Condition must be a real boolean","switch needs break","default = fallback case","ternary: cond ? a : b"],
+  quiz:[
+    {q:"In Java, the condition inside if() must be:", opts:["An integer","A boolean (true/false)","A String","A char"], a:1},
+    {q:"What happens if you forget 'break' in a Java switch case?", opts:["Compiler error","Execution falls through to the next case","Program stops immediately","Nothing changes"], a:1},
+    {q:"Which keyword handles the fallback option in a switch block?", opts:["else","default","other","final"], a:1},
+    {q:"The ternary operator syntax in Java is:", opts:["cond => a : b","cond ? a : b","if(cond){a}else{b} in one line only","cond -> a, b"], a:1},
+    {q:"Is 'if (5)' valid Java code?", opts:["Yes, 5 means true","No, the condition must be boolean, not int","Yes, but only in switch","Only inside loops"], a:1},
+  ]
+},
+{
+  id:"loops", title:"Loops", sub:"Repeating work efficiently in Java.",
+  notes:[
+    {h:"for loop", p:"Best when the number of repetitions is known ahead of time: for(int i=1; i<=5; i++). Java also has an enhanced for-each loop for arrays and collections: for(int m : marks) — 'for each element m in marks'."},
+    {h:"while loop", p:"Checks its boolean condition before each pass through the body — good when the number of repeats depends on a changing condition, like reading input until the user enters a sentinel value."},
+    {h:"do-while loop", p:"Checks the condition after running the body once, so the body always executes at least one time — handy for menu-driven console programs."},
+    {h:"break and continue", p:"break exits the nearest enclosing loop immediately. continue skips the rest of the current iteration and moves on to the next one."},
+  ],
+  code:`<span class="kw">public class</span> <span class="fn">Loops</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+        <span class="kw">for</span> (<span class="kw">int</span> i = 1; i &lt;= 5; i++) {
+            System.out.print(i + <span class="str">" "</span>);
+        }
+
+        <span class="kw">int</span> i = 1;
+        <span class="kw">while</span> (i &lt;= 5) {
+            System.out.print(i + <span class="str">" "</span>);
+            i++;
+        }
+
+        <span class="kw">int</span>[] nums = {2, 4, 6};
+        <span class="kw">for</span> (<span class="kw">int</span> n : nums) {   <span class="cm">// for-each</span>
+            System.out.print(n + <span class="str">" "</span>);
+        }
+    }
+}`,
+  chips:["for = known count","for-each loops arrays directly","do-while runs once first","break exits, continue skips"],
+  quiz:[
+    {q:"Which loop always runs its body at least once?", opts:["for","while","do-while","for-each"], a:2},
+    {q:"What does 'for (int n : nums)' do?", opts:["Loops n times","Loops through each element of nums directly","Creates a new array","Is invalid Java syntax"], a:1},
+    {q:"Which keyword exits a loop immediately, entirely?", opts:["continue","break","return only","exit"], a:1},
+    {q:"For 'for(int i=1;i<=5;i++)', how many times does the body run?", opts:["4","5","6","Infinite"], a:1},
+    {q:"Which keyword skips to the next loop iteration without exiting?", opts:["break","continue","stop","pass"], a:1},
+    {q:"What is a for-each loop mainly used for in Java?", opts:["Only counting numbers","Iterating directly over arrays/collections","Declaring variables","Handling exceptions"], a:1},
+  ]
+},
+{
+  id:"func", title:"Functions (Methods)", sub:"Splitting a Java program into small, reusable methods.",
+  notes:[
+    {h:"Methods live inside classes", p:"In Java, a 'function' is called a method, and it must be defined inside a class. Its signature is: accessModifier returnType name(parameters) { ...body... }. void means it returns nothing."},
+    {h:"static vs instance methods", p:"A static method belongs to the class itself and can be called without creating an object, e.g. from main() directly — most beginner exercises use static methods. An instance (non-static) method belongs to an object and requires you to create one first with new."},
+    {h:"Parameters and return values", p:"Java passes primitive values (int, double, etc.) by value — a copy is passed, so changes inside the method don't affect the original variable. Objects and arrays behave a bit differently since the reference is copied, but the object they point to can still be modified."},
+  ],
+  code:`<span class="kw">public class</span> <span class="fn">Calc</span> {
+    <span class="kw">static int</span> <span class="fn">square</span>(<span class="kw">int</span> n) {  <span class="cm">// method definition</span>
+        <span class="kw">return</span> n * n;
+    }
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+        <span class="kw">int</span> result = <span class="fn">square</span>(5); <span class="cm">// method call</span>
+        System.out.println(result);   <span class="cm">// 25</span>
+    }
+}`,
+  chips:["'Method' = Java's word for function","static methods need no object","void = no return value","primitives pass by value"],
+  quiz:[
+    {q:"What is a function called in Java?", opts:["Procedure","Method","Routine","Block"], a:1},
+    {q:"A static method can be called from main() without:", opts:["Any parameters","Creating an object first","A return type","Curly braces"], a:1},
+    {q:"A Java method that returns nothing has return type:", opts:["null","empty","void","none"], a:2},
+    {q:"How does Java pass primitive values like int to a method?", opts:["By reference","By value (a copy)","Randomly","It doesn't allow this"], a:1},
+    {q:"Where must every Java method be defined?", opts:["Outside any class","Inside a class","Inside main() only","Inside a loop"], a:1},
+  ]
+},
+{
+  id:"recur", title:"Recursion", sub:"A Java method that calls itself to solve smaller versions of a problem.",
+  notes:[
+    {h:"How recursion works", p:"A recursive method calls itself with a smaller input each time, until it reaches a base case. Each call waits on the call stack for the one below it to finish and return a value."},
+    {h:"Base case is essential", p:"Without a condition that stops further calls, the method will call itself endlessly and eventually throw a StackOverflowError — a real runtime error Java throws when the call stack runs out of space."},
+    {h:"Classic example: factorial", p:"factorial(n) = n * factorial(n-1), with base case factorial(0) = 1. Tracing factorial(3): 3 * factorial(2) → 3 * (2 * factorial(1)) → 3 * (2 * (1 * factorial(0))) → 3*2*1*1 = 6."},
+  ],
+  code:`<span class="kw">public class</span> <span class="fn">Fact</span> {
+    <span class="kw">static int</span> <span class="fn">factorial</span>(<span class="kw">int</span> n) {
+        <span class="kw">if</span> (n == 0)          <span class="cm">// base case</span>
+            <span class="kw">return</span> 1;
+        <span class="kw">return</span> n * <span class="fn">factorial</span>(n - 1); <span class="cm">// recursive call</span>
+    }
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+        System.out.println(<span class="fn">factorial</span>(5)); <span class="cm">// 120</span>
+    }
+}`,
+  chips:["base case stops it","recursive case shrinks the problem","uses the call stack","no base case = StackOverflowError"],
+  quiz:[
+    {q:"What error does Java throw when recursion never stops?", opts:["NullPointerException","StackOverflowError","ArithmeticException","SyntaxError"], a:1},
+    {q:"The base case in a recursive method exists to:", opts:["Make the method longer","Stop it from calling itself forever","Improve performance always","Print output"], a:1},
+    {q:"factorial(4) using the code above returns:", opts:["12","24","16","4"], a:1},
+    {q:"Where are pending recursive calls tracked while they wait to return?", opts:["The heap","A text file","The call stack","A static array"], a:2},
+  ]
+},
+{
+  id:"arrays", title:"Arrays", sub:"Storing many values of one type together in Java.",
+  notes:[
+    {h:"Declaring an array", p:"type[] name = new type[size]; creates an array object of a fixed size, e.g. int[] marks = new int[5];. You can also declare and fill it at once: int[] marks = {90, 85, 76, 60, 99};."},
+    {h:"Arrays are objects", p:"Unlike C, a Java array is a real object with a built-in property: marks.length gives its size directly — no need to track the size separately or risk it going out of sync."},
+    {h:"Indexing and bounds checking", p:"Elements are accessed with marks[i], index starting at 0. Unlike C, Java actively checks bounds at runtime — accessing marks[5] on a 5-element array throws an ArrayIndexOutOfBoundsException immediately, which makes bugs much easier to catch."},
+  ],
+  code:`<span class="kw">public class</span> <span class="fn">Arrays1</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+        <span class="kw">int</span>[] marks = {90, 85, 76, 60, 99};
+
+        <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; marks.length; i++) {
+            System.out.print(marks[i] + <span class="str">" "</span>);
+        }
+        <span class="cm">// marks[0] is 90, the first element</span>
+    }
+}`,
+  chips:["index starts at 0","arrays have .length built in","fixed size once created","out-of-bounds throws an exception"],
+  quiz:[
+    {q:"How do you find a Java array's size?", opts:["array.size()","array.length","len(array)","array.count()"], a:1},
+    {q:"What happens if you access an out-of-bounds index in Java?", opts:["Nothing, silently ignored","It throws an ArrayIndexOutOfBoundsException","It resizes the array","It returns 0"], a:1},
+    {q:"Given int[] marks={90,85,76,60,99}, what is marks[2]?", opts:["90","85","76","60"], a:2},
+    {q:"Which correctly declares and fills an array in one line?", opts:["int marks(5) = [90,85];","int[] marks = {90, 85};","array marks = new(90,85);","int marks[] -> 90,85;"], a:1},
+  ]
+}
+];
+
+/* ============ STATE ============ */
+let currentLang = 'c';
+let cloudReady = false;
+let cloudState = { read:{}, quizScores:{}, sandbox:{} };
+
+const templates = {
+  c: `#include <stdio.h>
+
+int main() {
+    printf("Hello, World!\\n");
+    return 0;
+}`,
+  java: `public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}`
+};
+
+window.__cloudReady = function(state){
+  cloudState = state;
+  cloudReady = true;
+  applyReadState();
+  const saved = cloudState.sandbox && cloudState.sandbox[currentLang];
+  document.getElementById('editorArea').value = saved || templates[currentLang];
+};
+
+function renderNav(){
+  const nav = document.getElementById('navlist');
+  nav.innerHTML = content[currentLang].map((t,i)=>`
+    <div class="navitem" id="nav-${t.id}" onclick="scrollToId('topic-${i+1}')">
+      <span class="num">${String(i+1).padStart(2,'0')}</span> ${t.title}
+      <span class="check">✓</span>
+    </div>`).join('');
+}
+
+function renderTopics(){
+  const wrap = document.getElementById('topics');
+  const list = content[currentLang];
+  wrap.innerHTML = list.map((t,i)=>`
+    <section class="topic" id="topic-${i+1}">
+      <div class="topic-head">
+        <div class="topic-head-left">
+          <span class="topic-index">${String(i+1).padStart(2,'0')}</span>
+          <h2>${t.title}</h2>
+        </div>
+        <button class="mark-read" id="mark-${t.id}" onclick="toggleRead('${t.id}')">☐ Mark as read</button>
+      </div>
+      <p class="topic-sub">${t.sub}</p>
+
+      ${t.notes.map(n=>`
+        <div class="note-card">
+          <h3>${n.h}</h3>
+          <p>${n.p}</p>
+        </div>`).join('')}
+
+      <div class="code-block">
+        <span class="tag">${currentLang.toUpperCase()}</span>
+        <pre>${t.code}</pre>
+      </div>
+
+      <div class="keypoints">
+        ${t.chips.map(c=>`<span class="chip">${c}</span>`).join('')}
+      </div>
+
+      <div class="practice-block">
+        <h4>✎ Practice — ${t.title}</h4>
+        ${t.quiz.map((q,qi)=>`
+          <div class="q">
+            <p class="qtext">${qi+1}. ${q.q}</p>
+            ${q.opts.map((o,oi)=>`<div class="opt" onclick="answer(this,'${t.id}',${qi},${oi},${q.a})">${o}</div>`).join('')}
+          </div>`).join('')}
+        <div class="score-line" id="score-${t.id}"></div>
+      </div>
+    </section>
+  `).join('');
+  applyReadState();
+}
+
+function applyReadState(){
+  if(!cloudReady) return;
+  content[currentLang].forEach(t=>{
+    const key = currentLang+':'+t.id;
+    const btn = document.getElementById('mark-'+t.id);
+    if(!btn) return;
+    const isRead = !!cloudState.read[key];
+    btn.classList.toggle('done', isRead);
+    btn.textContent = isRead ? '✓ Read' : '☐ Mark as read';
+    const nav = document.getElementById('nav-'+t.id);
+    if(nav){ isRead ? nav.classList.add('done') : nav.classList.remove('done'); }
+  });
+  updateProgressBar();
+}
+
+function toggleRead(topicId){
+  const key = currentLang+':'+topicId;
+  cloudState.read[key] = !cloudState.read[key];
+  window.__cloudSave({read: cloudState.read});
+  applyReadState();
+}
+
+function updateProgressBar(){
+  const list = content[currentLang];
+  const done = list.filter(t=>cloudState.read[currentLang+':'+t.id]).length;
+  document.getElementById('progressText').textContent = `${done} / ${list.length} read`;
+  document.getElementById('progressFill').style.width = (done/list.length*100)+'%';
+}
+
+function answer(el, topicId, qIndex, chosen, correctIndex){
+  const parent = el.parentElement;
+  const opts = parent.querySelectorAll('.opt');
+  opts.forEach(o=>o.classList.add('disabled'));
+  const correct = chosen === correctIndex;
+  if(correct) el.classList.add('correct');
+  else { el.classList.add('wrong'); opts[correctIndex].classList.add('correct'); }
+
+  const scoreKey = currentLang+':'+topicId;
+  if(!cloudState.quizScores[scoreKey]) cloudState.quizScores[scoreKey] = {correct:0, attempted:0};
+  cloudState.quizScores[scoreKey].attempted++;
+  if(correct) cloudState.quizScores[scoreKey].correct++;
+  window.__cloudSave({quizScores: cloudState.quizScores});
+
+  const s = cloudState.quizScores[scoreKey];
+  document.getElementById('score-'+topicId).textContent = `Score so far: ${s.correct} / ${s.attempted} correct`;
+}
+
+let mixedScoreCount = 0, mixedTotal = 0, mixedAnswered = 0;
+function renderMixedQuiz(){
+  const all = [];
+  content[currentLang].forEach(t=> t.quiz.forEach(q=> all.push({...q, topic:t.title})));
+  for(let i=all.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [all[i],all[j]]=[all[j],all[i]]; }
+  const picked = all.slice(0,12);
+  const box = document.getElementById('mixedQuizBox');
+  box.innerHTML = `<h4>✎ Mixed quiz (${currentLang.toUpperCase()}) <button class="reset-btn" onclick="renderMixedQuiz()">Shuffle again</button></h4>` +
+    picked.map((q,qi)=>`
+    <div class="q">
+      <p class="qtext">${qi+1}. ${q.q} <span style="color:var(--ink-soft);font-weight:400;font-family:var(--mono);font-size:11px;">(${q.topic})</span></p>
+      ${q.opts.map((o,oi)=>`<div class="opt" onclick="mixedAnswer(this,${oi},${q.a})">${o}</div>`).join('')}
+    </div>`).join('');
+  mixedScoreCount = 0; mixedTotal = picked.length; mixedAnswered = 0;
+  document.getElementById('mixedScore').textContent = '';
+}
+function mixedAnswer(el, chosen, correct){
+  const parent = el.parentElement;
+  const opts = parent.querySelectorAll('.opt');
+  opts.forEach(o=>o.classList.add('disabled'));
+  mixedAnswered++;
+  if(chosen===correct){ el.classList.add('correct'); mixedScoreCount++; }
+  else { el.classList.add('wrong'); opts[correct].classList.add('correct'); }
+  document.getElementById('mixedScore').textContent = `Score: ${mixedScoreCount} / ${mixedAnswered} answered (out of ${mixedTotal})`;
+  if(mixedAnswered === mixedTotal){
+    const key = 'mixed:'+currentLang;
+    if(!cloudState.quizScores[key]) cloudState.quizScores[key] = {correct:0, attempted:0};
+    cloudState.quizScores[key].correct += mixedScoreCount;
+    cloudState.quizScores[key].attempted += mixedTotal;
+    window.__cloudSave({quizScores: cloudState.quizScores});
+  }
+}
+
+function setLang(lang){
+  currentLang = lang;
+  document.getElementById('btnC').classList.toggle('active', lang==='c');
+  document.getElementById('btnJava').classList.toggle('active', lang==='java');
+  document.getElementById('langWordC').textContent = lang==='c' ? 'C' : 'Java';
+  document.getElementById('heroPara').textContent = lang==='c'
+    ? "Detailed, simple-English notes for C — with real code, quizzes, and a live editor to actually run what you write. Switch to Java anytime using the toggle at the top."
+    : "Detailed, simple-English notes for Java — with real code, quizzes, and a live editor to actually run what you write. Switch to C anytime using the toggle at the top.";
+  document.getElementById('runnerFilename').textContent = lang==='c' ? 'main.c' : 'Main.java';
+  renderNav();
+  renderTopics();
+  renderMixedQuiz();
+  initObserver();
+  const saved = cloudState.sandbox && cloudState.sandbox[lang];
+  document.getElementById('editorArea').value = saved || templates[lang];
+  document.getElementById('outputBox').innerHTML = '<span class="placeholder">Output will appear here after you run your code…</span>';
+}
+
+function scrollToId(id){ document.getElementById(id).scrollIntoView({behavior:'smooth', block:'start'}); }
+let observer;
+function initObserver(){
+  if(observer) observer.disconnect();
+  const sections = document.querySelectorAll('#topics .topic');
+  observer = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const idx = Array.from(sections).indexOf(e.target);
+        document.querySelectorAll('.navitem').forEach(n=>n.classList.remove('active'));
+        const nav = document.getElementById('nav-'+content[currentLang][idx].id);
+        if(nav) nav.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-20% 0px -70% 0px'});
+  sections.forEach(s=>observer.observe(s));
+}
+
+let runtimeMap = {};
+async function loadRuntimes(){
+  try{
+    const res = await fetch('https://emkc.org/api/v2/piston/runtimes');
+    const list = await res.json();
+    runtimeMap.c = list.find(r=>r.language==='c');
+    runtimeMap.java = list.find(r=>r.language==='java');
+  }catch(e){ console.warn('could not load piston runtimes', e); }
+}
+loadRuntimes();
+
+let sandboxTimeout;
+function setupSandboxSave(){
+  const area = document.getElementById('editorArea');
+  area.addEventListener('input', ()=>{
+    clearTimeout(sandboxTimeout);
+    sandboxTimeout = setTimeout(()=>{
+      if(!cloudState.sandbox) cloudState.sandbox = {};
+      cloudState.sandbox[currentLang] = area.value;
+      window.__cloudSave({sandbox: cloudState.sandbox});
+    }, 700);
+  });
+}
+function resetEditor(){
+  document.getElementById('editorArea').value = templates[currentLang];
+}
+
+async function runCode(){
+  const btn = document.getElementById('runBtn');
+  const out = document.getElementById('outputBox');
+  const status = document.getElementById('runnerStatus');
+  const code = document.getElementById('editorArea').value;
+  const stdin = document.getElementById('stdinBox').value;
+
+  btn.disabled = true; btn.textContent = '⏳ Running…'; status.textContent = 'compiling…';
+  out.innerHTML = '<span class="placeholder">Running…</span>';
+
+  const runtime = runtimeMap[currentLang];
+  if(!runtime){
+    out.innerHTML = '<span class="err">Could not reach the code execution service. Check your connection and try again.</span>';
+    btn.disabled = false; btn.textContent = '▷ Run code'; status.textContent = 'idle';
+    return;
+  }
+  const filename = currentLang === 'c' ? 'main.c' : 'Main.java';
+  try{
+    const res = await fetch('https://emkc.org/api/v2/piston/execute', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        language: runtime.language,
+        version: runtime.version,
+        files: [{ name: filename, content: code }],
+        stdin: stdin
+      })
+    });
+    const data = await res.json();
+    const compile = data.compile;
+    const run = data.run;
+    let html = '';
+    if(compile && compile.stderr){
+      html += `<span class="err">${escapeHtml(compile.stderr)}</span>\n`;
+    }
+    if(run){
+      if(run.stdout) html += escapeHtml(run.stdout);
+      if(run.stderr) html += `<span class="err">${escapeHtml(run.stderr)}</span>`;
+      if(!run.stdout && !run.stderr) html += '<span class="placeholder">(program ran with no output)</span>';
+    }
+    out.innerHTML = html || '<span class="placeholder">(no output)</span>';
+    status.textContent = 'done · exit code ' + (run ? run.code : '?');
+  }catch(e){
+    out.innerHTML = '<span class="err">Something went wrong reaching the run service. Try again in a moment.</span>';
+    status.textContent = 'error';
+  }
+  btn.disabled = false; btn.textContent = '▷ Run code';
+}
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+renderNav();
+renderTopics();
+renderMixedQuiz();
+initObserver();
+setupSandboxSave();
+document.getElementById('editorArea').value = templates.c;
+</script>
+</body>
+</html>
